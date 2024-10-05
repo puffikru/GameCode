@@ -1,0 +1,16 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{80436663-452C-C177-A6E2-7FBB9FAB4FA7}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "GameCode",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	]
+}
