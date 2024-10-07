@@ -3,11 +3,14 @@
 
 #include "Characters/GameCodeBasePawn.h"
 
+#include "Camera/CameraComponent.h"
+#include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/MovementComponents/GCBasePawnMovementComponent.h"
 #include "Engine/CollisionProfile.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCameras, Log, All)
@@ -16,13 +19,25 @@ DEFINE_LOG_CATEGORY_STATIC(LogCameras, Log, All)
 AGameCodeBasePawn::AGameCodeBasePawn()
 {
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Component"));
-    CollisionComponent->SetSphereRadius(50.0f);
+    CollisionComponent->SetSphereRadius(CollisionSphereRadius);
     CollisionComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
     SetRootComponent(CollisionComponent);
 
     // MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Movement Component"));
     MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UGCBasePawnMovementComponent>(TEXT("Movement Component"));
     MovementComponent->SetUpdatedComponent(CollisionComponent);
+
+    SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+    SpringArmComponent->bUsePawnControlRotation = true;
+    SpringArmComponent->SetupAttachment(GetRootComponent());
+
+    CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+    CameraComponent->SetupAttachment(SpringArmComponent);
+
+#if WITH_EDITORONLY_DATA
+    ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
+    ArrowComponent->SetupAttachment(GetRootComponent());
+#endif
 }
 
 // Called to bind functionality to input
