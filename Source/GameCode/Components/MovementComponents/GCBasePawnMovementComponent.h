@@ -19,9 +19,11 @@ class GAMECODE_API UGCBasePawnMovementComponent : public UPawnMovementComponent
 public:
     void JumpStart();
 
+    virtual bool IsFalling() const override;
+
 protected:
     UPROPERTY(EditAnywhere)
-    float MaxSpeed = 1200.0f;
+    float MaxSpeed = 600.0f;
 
     UPROPERTY(EditAnywhere)
     float InitialJumpVelocity = 500.0f;

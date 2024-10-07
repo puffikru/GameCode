@@ -17,24 +17,26 @@ void UGCBasePawnMovementComponent::TickComponent(float DeltaTime, ELevelTick Tic
     {
         FHitResult HitResult;
         FVector StartPoint = UpdatedComponent->GetComponentLocation();
-        float LineTraceLength = 50.0f + GetGravityZ() * DeltaTime;
-        FVector EndPoint = StartPoint - LineTraceLength * FVector::UpVector;
+        float TraceDepth = 1.0f;
+        float SphereRadius = 50.0f;
+        FVector EndPoint = StartPoint - TraceDepth * FVector::UpVector;
         FCollisionQueryParams CollisionParams;
         CollisionParams.AddIgnoredActor(GetOwner());
 
         bool bWasFalling = bIsFalling;
-        bIsFalling = !GetWorld()->LineTraceSingleByChannel(HitResult, StartPoint, EndPoint, ECC_Visibility, CollisionParams);
+        FCollisionShape Sphere = FCollisionShape::MakeSphere(SphereRadius);
+        bIsFalling = !GetWorld()->SweepSingleByChannel(HitResult, StartPoint, EndPoint, FQuat::Identity, ECC_Visibility, Sphere, CollisionParams);
         if (bIsFalling)
         {
             VerticalVelocity += GetGravityZ() * FVector::UpVector * DeltaTime;
-            Velocity += VerticalVelocity;
         }
-        else if (bWasFalling)
+        else if (bWasFalling && VerticalVelocity.Z < 0.0f)
         {
             VerticalVelocity = FVector::ZeroVector;
         }
     }
 
+    Velocity += VerticalVelocity;
     const FVector Delta = Velocity * DeltaTime;
     if (!Delta.IsNearlyZero(1e-6f))
     {
@@ -55,4 +57,8 @@ void UGCBasePawnMovementComponent::TickComponent(float DeltaTime, ELevelTick Tic
 void UGCBasePawnMovementComponent::JumpStart()
 {
     VerticalVelocity = InitialJumpVelocity * FVector::UpVector;
+}
+bool UGCBasePawnMovementComponent::IsFalling() const
+{
+    return bIsFalling;
 }
