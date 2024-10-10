@@ -20,6 +20,7 @@ void AGCPlayerController::SetupInputComponent()
     InputComponent->BindAxis("TurnAtRate", this, &AGCPlayerController::TurnAtRate);
     InputComponent->BindAxis("LookUpAtRate", this, &AGCPlayerController::LookUpAtRate);
     InputComponent->BindAction("Jump", IE_Pressed, this, &AGCPlayerController::Jump);
+    InputComponent->BindAction("Crouch", EInputEvent::IE_Pressed, this, &AGCPlayerController::ChangeCrouchState);
 }
 void AGCPlayerController::MoveForward(float Value)
 {
@@ -61,6 +62,13 @@ void AGCPlayerController::LookUpAtRate(float Value)
     if (CachedBaseCharacter.IsValid())
     {
         CachedBaseCharacter->LookUpAtRate(Value);
+    }
+}
+void AGCPlayerController::ChangeCrouchState()
+{
+    if (CachedBaseCharacter.IsValid())
+    {
+        CachedBaseCharacter->ChangeCrouchState();
     }
 }
 void AGCPlayerController::Jump()
