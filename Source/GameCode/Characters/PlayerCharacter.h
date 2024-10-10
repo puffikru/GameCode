@@ -28,7 +28,7 @@ public:
     virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 
     virtual bool CanJumpInternal_Implementation() const override;
-    virtual void OnJumped_Implementation();
+    virtual void OnJumped_Implementation() override;
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character | Camera")
