@@ -15,7 +15,7 @@ class GAMECODE_API APlayerCharacter : public AGCBaseCharacter
 	GENERATED_BODY()
 
 public:
-    APlayerCharacter();
+    APlayerCharacter(const FObjectInitializer& ObjectInitializer);
     
     virtual void MoveForward(float Value) override;
     virtual void MoveRight(float Value) override;

@@ -7,7 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
-APlayerCharacter::APlayerCharacter()
+APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
+    : Super(ObjectInitializer)
 {
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw = false;
