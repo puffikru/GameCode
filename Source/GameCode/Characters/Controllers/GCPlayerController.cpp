@@ -21,6 +21,8 @@ void AGCPlayerController::SetupInputComponent()
     InputComponent->BindAxis("LookUpAtRate", this, &AGCPlayerController::LookUpAtRate);
     InputComponent->BindAction("Jump", IE_Pressed, this, &AGCPlayerController::Jump);
     InputComponent->BindAction("Crouch", EInputEvent::IE_Pressed, this, &AGCPlayerController::ChangeCrouchState);
+    InputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &AGCPlayerController::StartSprint);
+    InputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &AGCPlayerController::StopSprint);
 }
 void AGCPlayerController::MoveForward(float Value)
 {
@@ -76,5 +78,19 @@ void AGCPlayerController::Jump()
     if (CachedBaseCharacter.IsValid())
     {
         CachedBaseCharacter->Jump();
+    }
+}
+void AGCPlayerController::StartSprint()
+{
+    if (CachedBaseCharacter.IsValid())
+    {
+        CachedBaseCharacter->StartSprint();
+    }
+}
+void AGCPlayerController::StopSprint()
+{
+    if (CachedBaseCharacter.IsValid())
+    {
+        CachedBaseCharacter->StopSprint();
     }
 }
