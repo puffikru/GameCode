@@ -29,4 +29,6 @@ void UGCBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     LeftFootEffectorLocation = FVector((CachedBaseCharacter->GetIKLeftFootOffset() + CachedBaseCharacter->GetIKPelvisOffset()) * -1, 0.0f, 0.0f);
     RightFootEffectorLocation = FVector(CachedBaseCharacter->GetIKRightFootOffset() + CachedBaseCharacter->GetIKPelvisOffset(), 0.0f, 0.0f);
     IKPelvisOffset = FVector(0.0f, 0.0f, CachedBaseCharacter->GetIKPelvisOffset());
+    LeftFootRotation = CachedBaseCharacter->GetLeftFootRotation();
+    RightFootRotation = CachedBaseCharacter->GetRightFootRotation();
 }

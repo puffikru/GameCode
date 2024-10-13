@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/MovementComponents/GCBaseCharacterMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AGCBaseCharacter::AGCBaseCharacter(const FObjectInitializer& ObjectInitializer)
@@ -106,4 +107,27 @@ void AGCBaseCharacter::UpdateIKSettings(float DeltaSeconds)
     IKLeftFootOffset = FMath::FInterpTo(IKLeftFootOffset, GetIKOffsetForASocket(LeftFootSocketName), DeltaSeconds, IKInterpSpeed);
     IKRightFootOffset = FMath::FInterpTo(IKRightFootOffset, GetIKOffsetForASocket(RightFootSocketName), DeltaSeconds, IKInterpSpeed);
     IKPelvisOffset = FMath::FInterpTo(IKPelvisOffset, GetIKOffsetForAPelvis(), DeltaSeconds, IKInterpSpeed);
+    LeftFootRotation = FMath::RInterpTo(LeftFootRotation, GetFootRotation(LeftFootSocketName), DeltaSeconds, IKInterpSpeed);
+    RightFootRotation = FMath::RInterpTo(LeftFootRotation, GetFootRotation(RightFootSocketName), DeltaSeconds, IKInterpSpeed);
+}
+FRotator AGCBaseCharacter::GetFootRotation(const FName& SocketName) const
+{
+    FRotator ResultRotation = FRotator::ZeroRotator;
+    float CapsuleHalfHight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+    const FVector SocketLocation = GetMesh()->GetSocketLocation(SocketName);
+    const FVector TraceStart(SocketLocation.X, SocketLocation.Y, GetActorLocation().Z);
+    const FVector TraceEnd = TraceStart - (CapsuleHalfHight + IKTraceDistance) * FVector::UpVector;
+
+    FHitResult HitResult;
+    const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(ECC_Visibility);
+    if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), TraceStart, TraceEnd, TraceType, true, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, HitResult, true, FColor::Green))
+    {
+        FVector HitNormal = HitResult.Normal;
+        float RotationRoll = UKismetMathLibrary::DegAtan2(HitNormal.Y, HitNormal.Z);
+        float RotationPitch = UKismetMathLibrary::DegAtan2(HitNormal.X, HitNormal.Z);
+        ResultRotation = FRotator(-RotationPitch, 0.0f, RotationRoll);
+    }
+    
+    return ResultRotation;
 }

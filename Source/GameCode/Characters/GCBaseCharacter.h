@@ -44,6 +44,10 @@ public:
     
     float GetIKPelvisOffset() const { return IKPelvisOffset; }
 
+    FRotator GetLeftFootRotation() const { return  LeftFootRotation; }
+
+    FRotator GetRightFootRotation() const { return RightFootRotation; }
+
 protected:
     UFUNCTION(BlueprintNativeEvent, Category="Character | Movement")
     void OnSprintStart();
@@ -77,10 +81,14 @@ private:
     float GetIKOffsetForASocket(const FName& SocketName) const;
     float GetIKOffsetForAPelvis() const;
     void UpdateIKSettings(float DeltaSeconds);
+    FRotator GetFootRotation(const FName& SocketName) const;
     
     bool bIsSprintRequested = false;
 
     float IKLeftFootOffset = 0.0f;
     float IKRightFootOffset = 0.0f;
     float IKPelvisOffset = 0.0f;
+
+    FRotator LeftFootRotation = FRotator::ZeroRotator;
+    FRotator RightFootRotation = FRotator::ZeroRotator;
 };

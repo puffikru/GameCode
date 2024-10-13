@@ -40,6 +40,12 @@ protected:
     UPROPERTY(EditAnywhere, Transient, BlueprintReadOnly, Category="Character | IK settings")
     FVector IKPelvisOffset = FVector::ZeroVector;
 
+    UPROPERTY(EditAnywhere, Transient, BlueprintReadOnly, Category="Character | IK settings")
+    FRotator RightFootRotation = FRotator::ZeroRotator;
+
+    UPROPERTY(EditAnywhere, Transient, BlueprintReadOnly, Category="Character | IK settings")
+    FRotator LeftFootRotation = FRotator::ZeroRotator;
+
 private:
     TWeakObjectPtr<class AGCBaseCharacter> CachedBaseCharacter;
 };
