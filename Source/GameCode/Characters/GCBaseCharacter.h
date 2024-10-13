@@ -32,6 +32,18 @@ public:
 
     FORCEINLINE UGCBaseCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return GCBaseCharacterMovementComponent; }
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character | IK settings")
+    FName LeftFootSocketName;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character | IK settings")
+    FName RightFootSocketName;
+    
+    float GetIKLeftFootOffset() const { return IKLeftFootOffset; }
+
+    float GetIKRightFootOffset() const { return IKRightFootOffset; }
+    
+    float GetIKPelvisOffset() const { return IKPelvisOffset; }
+
 protected:
     UFUNCTION(BlueprintNativeEvent, Category="Character | Movement")
     void OnSprintStart();
@@ -50,12 +62,25 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Character | Movement")
     float SprintSpeed = 800.0f;
 
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Character | IK settings", meta=(ClampMin = 0.0f, UIMin = 0.0f))
+    float IKInterpSpeed = 20.0f;
+    
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character | IK settings", meta = (ClampMin = 0.0f, UIMin = 0.0f))
+    float IKTraceDistance = 50.0f;
+
     virtual bool CanSprint();
 
     UGCBaseCharacterMovementComponent* GCBaseCharacterMovementComponent;
 
 private:
     void TryChangeSprintState();
+    float GetIKOffsetForASocket(const FName& SocketName) const;
+    float GetIKOffsetForAPelvis() const;
+    void UpdateIKSettings(float DeltaSeconds);
     
     bool bIsSprintRequested = false;
+
+    float IKLeftFootOffset = 0.0f;
+    float IKRightFootOffset = 0.0f;
+    float IKPelvisOffset = 0.0f;
 };
