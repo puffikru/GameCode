@@ -10,6 +10,10 @@ float UGCBaseCharacterMovementComponent::GetMaxSpeed() const
     {
         Result = SprintSpeed;
     }
+    if (bIsOutOfStamina)
+    {
+        Result = OutOfStaminaSpeed;
+    }
     return Result;
 }
 void UGCBaseCharacterMovementComponent::StartSprint()

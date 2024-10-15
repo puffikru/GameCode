@@ -21,10 +21,17 @@ public:
     void StartSprint();
     void StopSprint();
 
+    bool IsOutOfStamina() const { return bIsOutOfStamina; }
+    void SetIsOutOfStamina(bool bIsOutOfStamina_In) { bIsOutOfStamina = bIsOutOfStamina_In; }
+
 protected:
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement: sprint", meta=(ClampMin = 0.0f, UIMin = 0.0f))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Movement | Sprint", meta=(ClampMin = 0.0f, UIMin = 0.0f))
     float SprintSpeed = 1200.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Movement | Stamina", meta=(ClampMin = 0.0f, UIMin = 0.0f))
+    float OutOfStaminaSpeed = 300.0f;
     
 private:
-    bool bIsSprinting;
+    bool bIsSprinting = false;
+    bool bIsOutOfStamina = false;
 };

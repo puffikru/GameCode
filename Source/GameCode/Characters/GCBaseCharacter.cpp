@@ -44,8 +44,14 @@ void AGCBaseCharacter::StopSprint()
 void AGCBaseCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-    TryChangeSprintState();
+    TryChangeSprintState(DeltaSeconds);
     UpdateIKSettings(DeltaSeconds);
+    UpdateStamina(DeltaSeconds);
+}
+void AGCBaseCharacter::BeginPlay()
+{
+    Super::BeginPlay();
+    CurrentStamina = MaxStamina;
 }
 void AGCBaseCharacter::OnSprintStart_Implementation()
 {
@@ -58,10 +64,28 @@ void AGCBaseCharacter::OnSprintEnd_Implementation()
 
 bool AGCBaseCharacter::CanSprint()
 {
-    return true;
+    return !(GetBaseCharacterMovementComponent()->IsOutOfStamina() || GetBaseCharacterMovementComponent()->IsCrouching());
+}
+void AGCBaseCharacter::Jump()
+{
+    if (CanJump())
+    {
+        Super::Jump();
+    }
+}
+void AGCBaseCharacter::DrawDebugStamina()
+{
+    if (CurrentStamina < MaxStamina)
+    {
+        GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Green, FString::Printf(TEXT("Stamina: %f"), CurrentStamina));
+    }
+}
+bool AGCBaseCharacter::CanJump()
+{
+    return !GetBaseCharacterMovementComponent()->IsOutOfStamina();
 }
 
-void AGCBaseCharacter::TryChangeSprintState()
+void AGCBaseCharacter::TryChangeSprintState(float DeltaTime)
 {
     if (bIsSprintRequested && !GCBaseCharacterMovementComponent->IsSprinting() && CanSprint())
     {
@@ -69,7 +93,13 @@ void AGCBaseCharacter::TryChangeSprintState()
         OnSprintStart();
     }
 
-    if (!bIsSprintRequested && GCBaseCharacterMovementComponent->IsSprinting())
+    if (GCBaseCharacterMovementComponent->IsSprinting())
+    {
+        CurrentStamina -= SprintStaminaConsumptionVelocity * DeltaTime;
+        CurrentStamina = FMath::Clamp(CurrentStamina, 0.0f, MaxStamina);
+    }
+
+    if (GCBaseCharacterMovementComponent->IsSprinting() && !(bIsSprintRequested && CanSprint()))
     {
         GCBaseCharacterMovementComponent->StopSprint();
         OnSprintEnd();
@@ -121,13 +151,34 @@ FRotator AGCBaseCharacter::GetFootRotation(const FName& SocketName) const
 
     FHitResult HitResult;
     const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(ECC_Visibility);
-    if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), TraceStart, TraceEnd, TraceType, true, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, HitResult, true, FColor::Green))
+    if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), TraceStart, TraceEnd, TraceType, true, TArray<AActor*>(),
+            EDrawDebugTrace::ForOneFrame, HitResult, true, FColor::Green))
     {
         FVector HitNormal = HitResult.Normal;
         float RotationRoll = UKismetMathLibrary::DegAtan2(HitNormal.Y, HitNormal.Z);
         float RotationPitch = UKismetMathLibrary::DegAtan2(HitNormal.X, HitNormal.Z);
         ResultRotation = FRotator(-RotationPitch, 0.0f, RotationRoll);
     }
-    
+
     return ResultRotation;
+}
+void AGCBaseCharacter::UpdateStamina(float DeltaSeconds)
+{
+    if (!GetBaseCharacterMovementComponent()->IsSprinting())
+    {
+        CurrentStamina += StaminaRestoreVelocity * DeltaSeconds;
+        CurrentStamina = FMath::Clamp(CurrentStamina, 0.0f, MaxStamina);
+    }
+
+    if (FMath::IsNearlyZero(CurrentStamina))
+    {
+        GetBaseCharacterMovementComponent()->SetIsOutOfStamina(true);
+    }
+
+    if (FMath::IsNearlyEqual(CurrentStamina, MaxStamina))
+    {
+        GetBaseCharacterMovementComponent()->SetIsOutOfStamina(false);
+    }
+
+    DrawDebugStamina();
 }

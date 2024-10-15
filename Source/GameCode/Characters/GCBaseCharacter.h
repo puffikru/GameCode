@@ -47,8 +47,12 @@ public:
     FRotator GetLeftFootRotation() const { return  LeftFootRotation; }
 
     FRotator GetRightFootRotation() const { return RightFootRotation; }
+    
+    virtual void Jump() override;
 
 protected:
+    virtual void BeginPlay() override;
+    
     UFUNCTION(BlueprintNativeEvent, Category="Character | Movement")
     void OnSprintStart();
     virtual void OnSprintStart_Implementation();
@@ -72,12 +76,24 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character | IK settings", meta = (ClampMin = 0.0f, UIMin = 0.0f))
     float IKTraceDistance = 50.0f;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Character | Movement")
+    float MaxStamina = 100.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Character | Movement")
+    float StaminaRestoreVelocity = 25.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Character | Movement")
+    float SprintStaminaConsumptionVelocity = 25.0f;
+
     virtual bool CanSprint();
+    
+    void DrawDebugStamina();
+    virtual bool CanJump();
 
     UGCBaseCharacterMovementComponent* GCBaseCharacterMovementComponent;
 
 private:
-    void TryChangeSprintState();
+    void TryChangeSprintState(float DeltaTime);
     float GetIKOffsetForASocket(const FName& SocketName) const;
     float GetIKOffsetForAPelvis() const;
     void UpdateIKSettings(float DeltaSeconds);
@@ -91,4 +107,7 @@ private:
 
     FRotator LeftFootRotation = FRotator::ZeroRotator;
     FRotator RightFootRotation = FRotator::ZeroRotator;
+
+    float CurrentStamina = 0.0f;
+    void UpdateStamina(float DeltaSeconds);
 };
